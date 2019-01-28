@@ -6,22 +6,30 @@ namespace
 {
   class ACatalogue : public ::testing::Test
   {
+    using Catalogue_t = CatalogiCpp::Catalogue<double>;
+    using Event_t     = CatalogiCpp::Event<double>;
+
   protected:
     ACatalogue() {}
+    void SetUp()
+    {
+      Event_t e        = {"Event1",
+                   {},
+                   {Event_t::Product_t{"Product1", 10., 11.},
+                    Event_t::Product_t{"Product2", 11., 12.},
+                    Event_t::Product_t{"Product3", 10.2, 11.}},
+                   CatalogiCpp::make_uuid()};
+      c.events[e.uuid] = std::make_shared<Event_t>(e);
+    }
 
     virtual ~ACatalogue() {}
+    Catalogue_t c = {"Catastrophic", {}, CatalogiCpp::make_uuid()};
   };
 
-  TEST(ACatalogue, CanBeDefaultConstructed)
-  {
-    auto c = CatalogiCpp::Catalogue<double>();
-    EXPECT_FALSE(c.uuid.is_nil());
-  }
+  TEST_F(ACatalogue, CanBeDefaultConstructed) { EXPECT_FALSE(c.uuid.is_nil()); }
 
-  TEST(ACatalogue, CanBeConstructed)
+  TEST_F(ACatalogue, CanBeConstructed)
   {
-    auto c = CatalogiCpp::Catalogue<double>{
-        "Catastrophic", {}, CatalogiCpp::make_uuid()};
     EXPECT_FALSE(c.uuid.is_nil());
     EXPECT_EQ("Catastrophic", c.name);
   }

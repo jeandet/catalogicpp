@@ -1,6 +1,7 @@
 #ifndef EVENT_H
 #define EVENT_H
 #include <iostream>
+#include <optional>
 #include <string>
 #include <uuid.h>
 #include <vector>
@@ -24,6 +25,13 @@ namespace CatalogiCpp
     time_t stopTime;
   };
 
+  template<typename time_t>
+  bool operator==(const Product<time_t>& lhs, const Product<time_t>& rhs)
+  {
+    return (lhs.name == rhs.name) && (lhs.startTime == rhs.startTime) &&
+           (lhs.stopTime == rhs.stopTime);
+  }
+
   template<typename time_t = double> struct Event
   {
     using Product_t = Product<time_t>;
@@ -32,7 +40,7 @@ namespace CatalogiCpp
     std::vector<Product_t> products;
     uuids::uuid uuid = make_uuid();
 
-    time_t startTime()
+    std::optional<time_t> startTime()
     {
       if(products.size())
       {
@@ -44,11 +52,11 @@ namespace CatalogiCpp
       }
       else
       {
-        return time_t{};
+        return std::nullopt;
       }
     }
 
-    time_t stopTime()
+    std::optional<time_t> stopTime()
     {
       if(products.size())
       {
@@ -60,10 +68,20 @@ namespace CatalogiCpp
       }
       else
       {
-        return time_t{};
+        return std::nullopt;
       }
     }
   };
+
+  template<typename time_t>
+  bool operator==(const Event<time_t>& lhs, const Event<time_t>& rhs)
+  {
+    return (lhs.name == rhs.name) && (lhs.uuid == rhs.uuid) &&
+           (std::equal(std::begin(lhs.tags), std::end(lhs.tags),
+                       std::begin(rhs.tags))) &&
+           (std::equal(std::begin(lhs.products), std::end(lhs.products),
+                       std::begin(rhs.products)));
+  }
 
 } // namespace CatalogiCpp
 

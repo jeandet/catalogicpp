@@ -108,4 +108,5 @@ endmacro(declare_test)
 
 declare_test(Event Event tests/Event/main.cpp)
 declare_test(Catalogue Catalogue tests/Catalogue/main.cpp)
+declare_test(Repository Repository tests/Repository/main.cpp)
 declare_test(Json Json tests/Json/main.cpp)
