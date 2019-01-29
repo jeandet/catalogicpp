@@ -3,6 +3,7 @@
 #include <Catalogue.h>
 #include <Event.h>
 #include <Repository.h>
+#include <fstream>
 #include <json.hpp>
 #include <uuid.h>
 
@@ -14,12 +15,12 @@ namespace nlohmann
   {
     static void to_json(json& j, const uuids::uuid& id)
     {
-      j = json{uuids::to_string(id)};
+      j = uuids::to_string(id);
     }
 
     static void from_json(const json& j, uuids::uuid& id)
     {
-      id.from_string(std::string{j});
+      id = uuids::uuid::from_string(j.get<std::string>()).value();
     }
   };
 } // namespace nlohmann
@@ -88,10 +89,14 @@ namespace CatalogiCpp
   template<typename time_t = double>
   void to_json(json& j, const CatalogiCpp::Repository<time_t>& r)
   {
-    j = json{{"name", r.name}};
-    for(auto& event : r.event_pool)
+    j["name"] = r.name;
+    for(auto& event : r.events())
     {
-      j["event"][event->uuid] = *event;
+      j["events"].push_back(*event.second);
+    }
+    for(auto& catalogue : r.catalogues())
+    {
+      j["catalogues"].push_back(*catalogue.second);
     }
   }
 
@@ -99,6 +104,51 @@ namespace CatalogiCpp
   void from_json(const json& j, CatalogiCpp::Repository<time_t>& r)
   {
     j.at("name").get_to(r.name);
+    if(j.find("events") != j.end())
+    {
+      for(auto& event_js : j["events"])
+      {
+        r.add_event(std::make_shared<CatalogiCpp::Event<time_t>>(
+            event_js.get<CatalogiCpp::Event<time_t>>()));
+      }
+    }
+    if(j.find("catalogues") != j.end())
+    {
+      for(auto& catalogue_js : j["catalogues"])
+      {
+        auto catalogue  = std::make_unique<Catalogue<time_t>>();
+        catalogue->name = catalogue_js["name"];
+        catalogue->uuid = catalogue_js["uuid"];
+        for(auto event_js : catalogue_js["events"])
+        {
+          uuids::uuid uuid        = event_js["uuid"];
+          auto event              = r.event(uuid);
+          catalogue->events[uuid] = event;
+        }
+        r.add_catalogue(std::move(catalogue));
+      }
+    }
+  }
+
+  template<typename time_t = double>
+  bool save_repository(const CatalogiCpp::Repository<time_t>& r,
+                       const std::string& fname)
+  {
+    json js = r;
+    std::ofstream js_file;
+    js_file.open(fname);
+    js_file << js;
+    js_file.close();
+  }
+
+  template<typename time_t = double>
+  CatalogiCpp::Repository<time_t> load_repository(const std::string& fname)
+  {
+    std::ifstream js_file(fname);
+    json js;
+    js_file >> js;
+    return js.get<CatalogiCpp::Repository<time_t>>();
+    js_file.close();
   }
 } // namespace CatalogiCpp
 #endif

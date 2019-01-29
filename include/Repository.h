@@ -27,12 +27,17 @@ namespace CatalogiCpp
       {
         if(catalogue_id)
         {
-          auto catalogue_it = catalogues.find(*catalogue_id);
-          if(catalogue_it != std::end(catalogues))
+          auto catalogue_it = _catalogues.find(*catalogue_id);
+          if(catalogue_it != std::end(_catalogues))
           { catalogue_it->second->events[event->uuid] = event; }
         }
-        event_pool[event->uuid] = event;
+        _event_pool[event->uuid] = event;
       }
+    }
+
+    void add_catalogue(std::unique_ptr<Catalogue_t> catalogue)
+    {
+      if(catalogue) { _catalogues[catalogue->uuid] = std::move(catalogue); }
     }
 
     uuids::uuid new_catalogue(const std::string& name)
@@ -40,28 +45,56 @@ namespace CatalogiCpp
       std::unique_ptr<Catalogue_t> catalogue = std::make_unique<Catalogue_t>();
       catalogue->name                        = name;
       auto uuid                              = catalogue->uuid;
-      catalogues[uuid]                       = std::move(catalogue);
+      _catalogues[uuid]                      = std::move(catalogue);
       return uuid;
     }
 
     std::shared_ptr<Event_t> event(uuids::uuid event_id)
     {
-      auto event_it = event_pool.find(event_id);
-      if(event_it != std::end(event_pool)) { return event_it->second; }
+      auto event_it = _event_pool.find(event_id);
+      if(event_it != std::end(_event_pool)) { return event_it->second; }
       return nullptr;
     }
 
     Catalogue_t* catalogue(uuids::uuid catalogue_id)
     {
-      auto catalogue_it = catalogues.find(catalogue_id);
-      if(catalogue_it != std::end(catalogues))
+      auto catalogue_it = _catalogues.find(catalogue_id);
+      if(catalogue_it != std::end(_catalogues))
       { return catalogue_it->second.get(); }
       return nullptr;
     }
 
+    const std::map<uuids::uuid, std::shared_ptr<Event_t>>& events() const
+    {
+      return _event_pool;
+    }
+
+    const std::map<uuids::uuid, std::unique_ptr<Catalogue_t>>&
+    catalogues() const
+    {
+      return _catalogues;
+    }
+
+    friend bool operator==(const Repository<time_t>& lhs,
+                           const Repository<time_t>& rhs)
+    {
+      bool isEqual = (lhs.name == rhs.name);
+      isEqual &= std::equal(
+          std::begin(lhs._event_pool), std::end(lhs._event_pool),
+          std::begin(rhs._event_pool), [](const auto& a, const auto& b) {
+            return (a.first == b.first) && (*a.second == *b.second);
+          });
+      isEqual &= std::equal(
+          std::begin(lhs._catalogues), std::end(lhs._catalogues),
+          std::begin(rhs._catalogues), [](const auto& a, const auto& b) {
+            return (a.first == b.first) && (*a.second == *b.second);
+          });
+      return isEqual;
+    }
+
   private:
-    std::map<uuids::uuid, std::shared_ptr<Event_t>> event_pool;
-    std::map<uuids::uuid, std::unique_ptr<Catalogue_t>> catalogues;
+    std::map<uuids::uuid, std::shared_ptr<Event_t>> _event_pool;
+    std::map<uuids::uuid, std::unique_ptr<Catalogue_t>> _catalogues;
   };
 } // namespace CatalogiCpp
 

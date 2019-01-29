@@ -1,7 +1,9 @@
 #include "gtest/gtest.h"
 #include <Catalogue.h>
+#include <CatalogueIO.h>
 #include <Event.h>
 #include <Repository.h>
+#include <json.hpp>
 
 namespace
 {
@@ -30,8 +32,6 @@ namespace
                    Event_t::Product_t{"Product2", 11., 12.},
                    Event_t::Product_t{"Product3", 10.2, 11.}},
                   CatalogiCpp::make_uuid()};
-    Catalogue_t c1;
-    Catalogue_t c2;
   };
 
   TEST_F(ARepository, CanCreateACatalogue)
@@ -48,6 +48,22 @@ namespace
     auto e = r.event(event->uuid);
     EXPECT_EQ(*e, *event);
     EXPECT_EQ(e.get(), event.get());
+  }
+
+  TEST_F(ARepository, CanBeSavedToJson)
+  {
+    std::shared_ptr<Event_t> event = std::make_shared<Event_t>();
+    r.add_event(event);
+    auto e     = r.event(event->uuid);
+    using json = nlohmann::json;
+    json js    = r;
+    std::stringstream ss;
+    ss << js;
+    std::cout << js << std::endl;
+    json js2;
+    js2 << ss;
+    auto r2 = js2.get<CatalogiCpp::Repository<double>>();
+    EXPECT_EQ(r, r2);
   }
 } // namespace
 
