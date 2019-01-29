@@ -18,6 +18,11 @@ namespace CatalogiCpp
     std::map<uuids::uuid, std::shared_ptr<Event_t>> events;
     uuids::uuid uuid = make_uuid();
 
+    bool contains(const uuids::uuid& id)
+    {
+      return std::end(events) != events.find(id);
+    }
+
     /// @NOTE this is not very efficient since startTime doesn't cache the value
     std::optional<time_t> startTime()
     {

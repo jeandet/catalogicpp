@@ -35,6 +35,33 @@ namespace CatalogiCpp
       }
     }
 
+    void remove_event(std::shared_ptr<Event_t> event,
+                      std::optional<uuids::uuid> catalogue_id = std::nullopt)
+    {
+      if(event) { remove_event(event->uuid, catalogue_id); }
+    }
+
+    void remove_event(uuids::uuid event_id,
+                      std::optional<uuids::uuid> catalogue_id = std::nullopt)
+    {
+      if(catalogue_id)
+      {
+        auto catalogue_it = _catalogues.find(*catalogue_id);
+        if(catalogue_it != std::end(_catalogues))
+        {
+          catalogue_it->second->events.erase(event_id);
+        }
+      }
+      else
+      {
+        for(auto& [_, catalogue] : _catalogues)
+        {
+          catalogue->events.erase(event_id);
+        }
+        _event_pool.erase(event_id);
+      }
+    }
+
     void add_catalogue(std::unique_ptr<Catalogue_t> catalogue)
     {
       if(catalogue) { _catalogues[catalogue->uuid] = std::move(catalogue); }
