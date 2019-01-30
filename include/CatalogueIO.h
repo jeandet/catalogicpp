@@ -139,6 +139,7 @@ namespace CatalogiCpp
     js_file.open(fname);
     js_file << js;
     js_file.close();
+    return true;
   }
 
   template<typename time_t = double>
@@ -147,8 +148,8 @@ namespace CatalogiCpp
     std::ifstream js_file(fname);
     json js;
     js_file >> js;
-    return js.get<CatalogiCpp::Repository<time_t>>();
     js_file.close();
+    return js.get<CatalogiCpp::Repository<time_t>>();
   }
 } // namespace CatalogiCpp
 #endif

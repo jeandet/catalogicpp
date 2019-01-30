@@ -38,14 +38,6 @@ IF(IWYU)
 ENDIF(IWYU)
 
 
-add_library(CatalogiCpp INTERFACE)
-
-target_include_directories(CatalogiCpp
-  INTERFACE
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
-    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-)
-
 find_package(benchmark)
 if(benchmark_FOUND)
     #add_executable(TS_benchmarks tests/benchmarks/main.cpp)
@@ -75,6 +67,17 @@ endif()
 add_subdirectory(googletest)
 include_directories(${gtest_SOURCE_DIR}/include ${gtest_SOURCE_DIR})
 include_directories(${gmock_SOURCE_DIR}/include ${gmock_SOURCE_DIR})
+
+
+add_library(CatalogiCpp INTERFACE)
+
+target_include_directories(CatalogiCpp
+  INTERFACE
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/external/stduuid/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/external/json/src>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+)
 
 enable_testing()
 

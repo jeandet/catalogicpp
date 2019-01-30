@@ -19,6 +19,25 @@ namespace CatalogiCpp
     using Catalogue_t = Catalogue<time_t>;
 
     std::string name;
+    Repository() = default;
+    Repository(const Repository& other)
+    {
+      for(const auto& [uuid, event]:other._event_pool)
+      {
+        _event_pool[uuid] = std::make_shared<Event_t>(*event);
+      }
+      for(const auto& [uuid, catalog]:other._catalogues)
+      {
+        auto catalogue_copy = std::make_unique<Catalogue_t>();
+        catalogue_copy->uuid = catalog->uuid;
+        catalogue_copy->name = catalog->name;
+        for(const auto& [uuid, event]:other._event_pool)
+        {
+          catalogue_copy->events[uuid] = _event_pool[uuid];
+        }
+        _catalogues[uuid] = std::move(catalogue_copy);
+      }
+    }
 
     void add_event(std::shared_ptr<Event_t> event,
                    std::optional<uuids::uuid> catalogue_id = std::nullopt)

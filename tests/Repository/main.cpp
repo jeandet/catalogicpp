@@ -50,6 +50,17 @@ namespace
     EXPECT_EQ(e.get(), event.get());
   }
 
+  TEST_F(ARepository, CopyIsDifferent)
+  {
+    std::shared_ptr<Event_t> event = std::make_shared<Event_t>();
+    r.add_event(event);
+    auto r2 = r;
+    auto e  = r2.event(event->uuid);
+    EXPECT_EQ(*e, *event);
+    EXPECT_EQ(r, r2);
+    EXPECT_NE(e.get(), event.get());
+  }
+
   TEST_F(ARepository, CanRemoveAnEvent)
   {
     std::shared_ptr<Event_t> event = std::make_shared<Event_t>();
