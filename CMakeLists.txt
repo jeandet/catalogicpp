@@ -110,3 +110,12 @@ declare_test(Event Event tests/Event/main.cpp)
 declare_test(Catalogue Catalogue tests/Catalogue/main.cpp)
 declare_test(Repository Repository tests/Repository/main.cpp)
 declare_test(Json Json tests/Json/main.cpp)
+
+install(TARGETS CatalogiCpp EXPORT CatalogiCppConfig
+    ARCHIVE  DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    LIBRARY  DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME  DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/CatalogiCpp)
+install(EXPORT CatalogiCppConfig DESTINATION share/CatalogiCpp/cmake)
+export(TARGETS CatalogiCpp FILE CatalogiCppConfig.cmake)
