@@ -61,13 +61,15 @@ namespace CatalogiCpp
   }
 
   template<typename time_t = double>
-  void to_json(json& j, const std::shared_ptr<CatalogiCpp::Event<time_t>>& e)
+  void to_json(json& j,
+               const typename CatalogiCpp::Repository<time_t>::Event_ptr& e)
   {
     j = json{{"uuid", e->uuid}};
   }
 
   template<typename time_t = double>
-  void from_json(const json& j, std::shared_ptr<CatalogiCpp::Event<time_t>>& e)
+  void from_json(const json& j,
+                 typename CatalogiCpp::Repository<time_t>::Event_ptr& e)
   {
     e = nullptr;
   }
@@ -85,7 +87,7 @@ namespace CatalogiCpp
     j.at("uuid").get_to(c.uuid);
     for(auto& event_js : j["events"])
     {
-      c.add(std::make_shared<CatalogiCpp::Event<time_t>>(
+      c.add(CatalogiCpp::Catalogue<time_t>::make_event_ptr(
           event_js.get<CatalogiCpp::Event<time_t>>()));
     }
   }
@@ -112,7 +114,7 @@ namespace CatalogiCpp
     {
       for(auto& event_js : j["events"])
       {
-        r.add(std::make_shared<CatalogiCpp::Event<time_t>>(
+        r.add(CatalogiCpp::Catalogue<time_t>::make_event_ptr(
             event_js.get<CatalogiCpp::Event<time_t>>()));
       }
     }
@@ -120,7 +122,7 @@ namespace CatalogiCpp
     {
       for(auto& catalogue_js : j["catalogues"])
       {
-        auto catalogue  = std::make_unique<Catalogue<time_t>>();
+        auto catalogue  = CatalogiCpp::Repository<time_t>::make_catalogue_ptr();
         catalogue->name = catalogue_js["name"];
         catalogue->uuid = catalogue_js["uuid"];
         for(auto event_js : catalogue_js["events"])
@@ -129,7 +131,7 @@ namespace CatalogiCpp
           auto event       = r.event(uuid);
           catalogue->add(event);
         }
-        r.add(std::move(catalogue));
+        r.add(catalogue);
       }
     }
   }

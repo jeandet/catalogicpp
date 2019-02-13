@@ -43,7 +43,7 @@ namespace
 
   TEST_F(ARepository, CanAddAnEvent)
   {
-    std::shared_ptr<Event_t> event = std::make_shared<Event_t>();
+    auto event = Catalogue_t::make_event_ptr();
     repo.add(event);
     auto e = repo.event(event->uuid);
     EXPECT_EQ(*e, *event);
@@ -52,8 +52,8 @@ namespace
 
   TEST_F(ARepository, CanAddAnEventFromCatalogue)
   {
-    std::shared_ptr<Event_t> event = std::make_shared<Event_t>();
-    auto catalogue                 = repo.catalogue(repo.new_catalogue("test"));
+    auto event     = Catalogue_t::make_event_ptr();
+    auto catalogue = repo.catalogue(repo.new_catalogue("test"));
     // Adding and removing an event to a catalogue should add the event to the
     // repository pool
     catalogue->add(event);
@@ -66,7 +66,7 @@ namespace
 
   TEST_F(ARepository, CopyIsDifferent)
   {
-    std::shared_ptr<Event_t> event = std::make_shared<Event_t>();
+    auto event = Catalogue_t::make_event_ptr();
     repo.add(event);
     auto repo2 = repo;
     auto e     = repo2.event(event->uuid);
@@ -77,7 +77,7 @@ namespace
 
   TEST_F(ARepository, CanRemoveAnEvent)
   {
-    std::shared_ptr<Event_t> event = std::make_shared<Event_t>();
+    auto event = Catalogue_t::make_event_ptr();
     repo.add(event);
     auto e = repo.event(event->uuid);
     EXPECT_EQ(*e, *event);
@@ -89,7 +89,7 @@ namespace
 
   TEST_F(ARepository, CanBeSavedToJson)
   {
-    std::shared_ptr<Event_t> event = std::make_shared<Event_t>();
+    auto event = Catalogue_t::make_event_ptr();
     repo.add(event);
     auto e     = repo.event(event->uuid);
     using json = nlohmann::json;

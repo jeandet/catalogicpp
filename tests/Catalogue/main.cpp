@@ -19,7 +19,7 @@ namespace
                     Event_t::Product_t{"Product2", 11., 12.},
                     Event_t::Product_t{"Product3", 10.2, 11.}},
                    CatalogiCpp::make_uuid()};
-      c.add(std::make_shared<Event_t>(e));
+      c.add(Catalogue_t::make_event_ptr(e));
     }
 
     virtual ~ACatalogue() {}

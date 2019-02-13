@@ -13,50 +13,50 @@ namespace CatalogiCpp
 {
   template<typename time_t = double> struct Catalogue
   {
-    using Event_t = Event<time_t>;
+    using uuid_t    = uuids::uuid;
+    using Event_t   = Event<time_t>;
+    using Event_ptr = std::shared_ptr<Event_t>;
+    template<typename... _Args>
+    static inline Event_ptr make_event_ptr(_Args&&... __args)
+    {
+      return std::make_shared<Event_t>(__args...);
+    }
     std::string name;
-    uuids::uuid uuid = make_uuid();
-    std::map<void*, std::function<void(std::shared_ptr<Event_t>)>>
-        event_added_callbacks;
+    uuid_t uuid = make_uuid();
+    std::map<void*, std::function<void(Event_ptr)>> event_added_callbacks;
 
     Catalogue() {}
-    Catalogue(const std::string& name, const uuids::uuid& uuid,
-              const std::map<uuids::uuid, std::shared_ptr<Event_t>>& events)
+    Catalogue(const std::string& name, const uuid_t& uuid,
+              const std::map<uuid_t, Event_ptr>& events)
         : name{name}, uuid{uuid}, _events{events}
     {}
 
-    bool contains(const uuids::uuid& id)
+    bool contains(const uuid_t& id)
     {
       return std::end(_events) != _events.find(id);
     }
 
-    const std::map<uuids::uuid, std::shared_ptr<Event_t>> events() const
-    {
-      return _events;
-    }
+    const std::map<uuid_t, Event_ptr> events() const { return _events; }
 
-    std::shared_ptr<Event_t> event(const uuids::uuid& id)
-    {
-      return _events[id];
-    }
+    Event_ptr event(const uuid_t& id) { return _events[id]; }
 
-    const Event_t& event(const uuids::uuid& id) const { return *_events[id]; }
+    const Event_t& event(const uuid_t& id) const { return *_events[id]; }
 
-    void add(std::shared_ptr<Event_t> e)
+    void add(Event_ptr event)
     {
-      if(e)
+      if(event)
       {
-        _events[e->uuid] = e;
+        _events[event->uuid] = event;
         for(auto& [_, callback] : event_added_callbacks)
         {
-          callback(e);
+          callback(event);
         }
       }
     }
 
-    void remove(const uuids::uuid& id) { _events.erase(id); }
+    void remove(const uuid_t& id) { _events.erase(id); }
 
-    void remove(std::shared_ptr<Event_t>& e) { remove(e->uuid); }
+    void remove(Event_ptr& e) { remove(e->uuid); }
 
     /// @NOTE this is not very efficient since startTime doesn't cache the value
     std::optional<time_t> startTime()
@@ -106,7 +106,7 @@ namespace CatalogiCpp
     auto cend() const noexcept { return std::cend(_events); }
 
   private:
-    std::map<uuids::uuid, std::shared_ptr<Event_t>> _events;
+    std::map<uuid_t, Event_ptr> _events;
   };
 
 } // namespace CatalogiCpp
