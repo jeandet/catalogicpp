@@ -24,7 +24,7 @@ namespace CatalogiCpp
     template<typename... _Args>
     static inline Catalogue_ptr make_catalogue_ptr(_Args&&... __args)
     {
-      return std::make_shared<Catalogue_t>(__args...);
+      return std::make_shared<Catalogue_t>(std::forward<_Args>(__args)...);
     }
 
     std::string name;

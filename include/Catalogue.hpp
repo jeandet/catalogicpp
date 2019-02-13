@@ -19,7 +19,7 @@ namespace CatalogiCpp
     template<typename... _Args>
     static inline Event_ptr make_event_ptr(_Args&&... __args)
     {
-      return std::make_shared<Event_t>(__args...);
+      return std::make_shared<Event_t>(std::forward<_Args>(__args)...);
     }
     std::string name;
     uuid_t uuid = make_uuid();
