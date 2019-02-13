@@ -1,5 +1,5 @@
-#ifndef JSONIO_H
-#define JSONIO_H
+#ifndef CATALOGUEIO_H
+#define CATALOGUEIO_H
 #include <Catalogue.hpp>
 #include <Event.hpp>
 #include <Repository.hpp>

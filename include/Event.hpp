@@ -8,7 +8,7 @@
 
 namespace CatalogiCpp
 {
-  uuids::uuid make_uuid()
+  inline uuids::uuid make_uuid()
   {
     std::random_device rd;
     auto seed_data = std::array<int, std::mt19937::state_size>{};
