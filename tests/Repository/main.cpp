@@ -1,8 +1,8 @@
 #include "gtest/gtest.h"
-#include <Catalogue.h>
-#include <CatalogueIO.h>
-#include <Event.h>
-#include <Repository.h>
+#include <Catalogue.hpp>
+#include <CatalogueIO.hpp>
+#include <Event.hpp>
+#include <Repository.hpp>
 #include <json.hpp>
 
 namespace
@@ -18,7 +18,7 @@ namespace
     void SetUp() {}
 
     virtual ~ARepository() {}
-    Repository_t r;
+    Repository_t repo;
     Event_t e1 = {"Event1",
                   {},
                   {Event_t::Product_t{"Product1", 10., 11.},
@@ -36,16 +36,30 @@ namespace
 
   TEST_F(ARepository, CanCreateACatalogue)
   {
-    auto id = r.new_catalogue("Catalogue1");
-    EXPECT_NE(nullptr, r.catalogue(id));
-    EXPECT_EQ("Catalogue1", r.catalogue(id)->name);
+    auto id = repo.new_catalogue("Catalogue1");
+    EXPECT_NE(nullptr, repo.catalogue(id));
+    EXPECT_EQ("Catalogue1", repo.catalogue(id)->name);
   }
 
   TEST_F(ARepository, CanAddAnEvent)
   {
     std::shared_ptr<Event_t> event = std::make_shared<Event_t>();
-    r.add_event(event);
-    auto e = r.event(event->uuid);
+    repo.add(event);
+    auto e = repo.event(event->uuid);
+    EXPECT_EQ(*e, *event);
+    EXPECT_EQ(e.get(), event.get());
+  }
+
+  TEST_F(ARepository, CanAddAnEventFromCatalogue)
+  {
+    std::shared_ptr<Event_t> event = std::make_shared<Event_t>();
+    auto catalogue                 = repo.catalogue(repo.new_catalogue("test"));
+    // Adding and removing an event to a catalogue should add the event to the
+    // repository pool
+    catalogue->add(event);
+    catalogue->remove(event);
+    auto e = repo.event(event->uuid);
+    EXPECT_TRUE(e);
     EXPECT_EQ(*e, *event);
     EXPECT_EQ(e.get(), event.get());
   }
@@ -53,40 +67,40 @@ namespace
   TEST_F(ARepository, CopyIsDifferent)
   {
     std::shared_ptr<Event_t> event = std::make_shared<Event_t>();
-    r.add_event(event);
-    auto r2 = r;
-    auto e  = r2.event(event->uuid);
+    repo.add(event);
+    auto repo2 = repo;
+    auto e     = repo2.event(event->uuid);
     EXPECT_EQ(*e, *event);
-    EXPECT_EQ(r, r2);
+    EXPECT_EQ(repo, repo2);
     EXPECT_NE(e.get(), event.get());
   }
 
   TEST_F(ARepository, CanRemoveAnEvent)
   {
     std::shared_ptr<Event_t> event = std::make_shared<Event_t>();
-    r.add_event(event);
-    auto e = r.event(event->uuid);
+    repo.add(event);
+    auto e = repo.event(event->uuid);
     EXPECT_EQ(*e, *event);
     EXPECT_EQ(e.get(), event.get());
-    r.remove_event(event);
-    e = r.event(event->uuid);
+    repo.remove(event);
+    e = repo.event(event->uuid);
     EXPECT_FALSE(e);
   }
 
   TEST_F(ARepository, CanBeSavedToJson)
   {
     std::shared_ptr<Event_t> event = std::make_shared<Event_t>();
-    r.add_event(event);
-    auto e     = r.event(event->uuid);
+    repo.add(event);
+    auto e     = repo.event(event->uuid);
     using json = nlohmann::json;
-    json js    = r;
+    json js    = repo;
     std::stringstream ss;
     ss << js;
     std::cout << js << std::endl;
     json js2;
     js2 << ss;
-    auto r2 = js2.get<CatalogiCpp::Repository<double>>();
-    EXPECT_EQ(r, r2);
+    auto repo2 = js2.get<CatalogiCpp::Repository<double>>();
+    EXPECT_EQ(repo, repo2);
   }
 } // namespace
 

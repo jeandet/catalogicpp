@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
-#include <Catalogue.h>
-#include <Event.h>
+#include <Catalogue.hpp>
+#include <Event.hpp>
 
 namespace
 {

@@ -1,6 +1,6 @@
 #include "gtest/gtest.h"
-#include <Catalogue.h>
-#include <Event.h>
+#include <Catalogue.hpp>
+#include <Event.hpp>
 
 namespace
 {
@@ -13,17 +13,17 @@ namespace
     ACatalogue() {}
     void SetUp()
     {
-      Event_t e        = {"Event1",
+      Event_t e = {"Event1",
                    {},
                    {Event_t::Product_t{"Product1", 10., 11.},
                     Event_t::Product_t{"Product2", 11., 12.},
                     Event_t::Product_t{"Product3", 10.2, 11.}},
                    CatalogiCpp::make_uuid()};
-      c.events[e.uuid] = std::make_shared<Event_t>(e);
+      c.add(std::make_shared<Event_t>(e));
     }
 
     virtual ~ACatalogue() {}
-    Catalogue_t c = {"Catastrophic", {}, CatalogiCpp::make_uuid()};
+    Catalogue_t c = {"Catastrophic", CatalogiCpp::make_uuid(), {}};
   };
 
   TEST_F(ACatalogue, CanBeDefaultConstructed) { EXPECT_FALSE(c.uuid.is_nil()); }

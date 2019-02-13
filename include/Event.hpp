@@ -83,6 +83,11 @@ namespace CatalogiCpp
                        std::begin(rhs.products)));
   }
 
+  template<typename time_t>
+  bool operator!=(const Event<time_t>& lhs, const Event<time_t>& rhs)
+  {
+    return !(lhs == rhs);
+  }
 } // namespace CatalogiCpp
 
 #endif // EVENT_H

@@ -1,8 +1,8 @@
 #ifndef JSONIO_H
 #define JSONIO_H
-#include <Catalogue.h>
-#include <Event.h>
-#include <Repository.h>
+#include <Catalogue.hpp>
+#include <Event.hpp>
+#include <Repository.hpp>
 #include <fstream>
 #include <json.hpp>
 #include <uuid.h>
@@ -75,7 +75,7 @@ namespace CatalogiCpp
   template<typename time_t = double>
   void to_json(json& j, const CatalogiCpp::Catalogue<time_t>& c)
   {
-    j = json{{"name", c.name}, {"uuid", c.uuid}, {"events", c.events}};
+    j = json{{"name", c.name}, {"uuid", c.uuid}, {"events", c.events()}};
   }
 
   template<typename time_t = double>
@@ -83,7 +83,11 @@ namespace CatalogiCpp
   {
     j.at("name").get_to(c.name);
     j.at("uuid").get_to(c.uuid);
-    j.at("events").get_to(c.events);
+    for(auto& event_js : j["events"])
+    {
+      c.add(std::make_shared<CatalogiCpp::Event<time_t>>(
+          event_js.get<CatalogiCpp::Event<time_t>>()));
+    }
   }
 
   template<typename time_t = double>
@@ -108,7 +112,7 @@ namespace CatalogiCpp
     {
       for(auto& event_js : j["events"])
       {
-        r.add_event(std::make_shared<CatalogiCpp::Event<time_t>>(
+        r.add(std::make_shared<CatalogiCpp::Event<time_t>>(
             event_js.get<CatalogiCpp::Event<time_t>>()));
       }
     }
@@ -121,11 +125,11 @@ namespace CatalogiCpp
         catalogue->uuid = catalogue_js["uuid"];
         for(auto event_js : catalogue_js["events"])
         {
-          uuids::uuid uuid        = event_js["uuid"];
-          auto event              = r.event(uuid);
-          catalogue->events[uuid] = event;
+          uuids::uuid uuid = event_js["uuid"];
+          auto event       = r.event(uuid);
+          catalogue->add(event);
         }
-        r.add_catalogue(std::move(catalogue));
+        r.add(std::move(catalogue));
       }
     }
   }
