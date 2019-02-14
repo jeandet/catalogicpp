@@ -30,6 +30,15 @@ namespace CatalogiCpp
     std::string name;
 
     Repository() = default;
+
+    /**
+     * @brief Repository copy ctor
+     * @param other
+     *
+     * @details copying a Repository is quite tricky, it should copy all events
+     * with detached shared_ptrs so that copied repo doesn't share event with
+     * original;
+     */
     Repository(const Repository& other)
     {
       for(const auto& [uuid, event] : other._event_pool)
@@ -140,6 +149,16 @@ namespace CatalogiCpp
     const std::map<uuid_t, Catalogue_ptr>& catalogues() const
     {
       return _catalogues;
+    }
+
+    bool contains(Event_ptr event)
+    {
+      return _event_pool.find(event->uuid) != std::cend(_event_pool);
+    }
+
+    bool contains(Catalogue_ptr catalogue)
+    {
+      return _catalogues.find(catalogue->uuid) != std::cend(_catalogues);
     }
 
     friend bool operator==(const Repository<time_t>& lhs,
