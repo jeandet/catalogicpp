@@ -4,7 +4,7 @@
 #include <Event.hpp>
 #include <Repository.hpp>
 #include <fstream>
-#include <json.hpp>
+#include <nlohmann/json.hpp>
 #include <uuid.h>
 
 using nlohmann::json;

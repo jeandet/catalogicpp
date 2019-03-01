@@ -3,7 +3,6 @@
 #include <CatalogueIO.hpp>
 #include <Event.hpp>
 #include <Repository.hpp>
-#include <json.hpp>
 
 namespace
 {
