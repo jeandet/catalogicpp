@@ -4,7 +4,11 @@
 #include <Event.hpp>
 #include <Repository.hpp>
 #include <fstream>
+#if __has_include(<nlohmann/json.hpp>)
 #include <nlohmann/json.hpp>
+#else
+#include <json.hpp>
+#endif
 #include <uuid.h>
 
 using nlohmann::json;
