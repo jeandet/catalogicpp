@@ -97,7 +97,7 @@ namespace
     ss << js;
     std::cout << js << std::endl;
     json js2;
-    js2 << ss;
+    ss >> js2;
     auto repo2 = js2.get<CatalogiCpp::Repository<double>>();
     EXPECT_EQ(repo, repo2);
   }
