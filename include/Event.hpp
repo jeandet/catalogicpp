@@ -40,11 +40,11 @@ namespace CatalogiCpp
     std::vector<Product_t> products;
     uuids::uuid uuid = make_uuid();
 
-    std::optional<time_t> startTime()
+    std::optional<time_t> startTime() const
     {
       if(products.size())
       {
-        return std::min_element(std::begin(products), std::end(products),
+        return std::min_element(std::cbegin(products), std::cend(products),
                                 [](const Product_t& x, const Product_t& y) {
                                   return x.startTime < y.startTime;
                                 })
@@ -56,11 +56,11 @@ namespace CatalogiCpp
       }
     }
 
-    std::optional<time_t> stopTime()
+    std::optional<time_t> stopTime() const
     {
       if(products.size())
       {
-        return std::max_element(std::begin(products), std::end(products),
+        return std::max_element(std::cbegin(products), std::cend(products),
                                 [](const Product_t& x, const Product_t& y) {
                                   return x.stopTime < y.stopTime;
                                 })

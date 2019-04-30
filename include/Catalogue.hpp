@@ -40,7 +40,7 @@ namespace CatalogiCpp
 
     Event_ptr event(const uuid_t& id) { return _events[id]; }
 
-    const Event_t& event(const uuid_t& id) const { return *_events[id]; }
+    const Event_ptr& event(const uuid_t& id) const { return _events.at(id); }
 
     void add(Event_ptr event)
     {
@@ -59,19 +59,20 @@ namespace CatalogiCpp
     void remove(Event_ptr& e) { remove(e->uuid); }
 
     /// @NOTE this is not very efficient since startTime doesn't cache the value
-    std::optional<time_t> startTime()
+    std::optional<time_t> startTime() const
     {
       if(_events.size())
       {
-        return std::min_element(std::begin(_events), std::end(_events),
-                                [](const Event_t& x, const Event_t& y) {
-                                  auto sx = x.startTime(), sy = y.startTime();
+        return std::min_element(std::cbegin(_events), std::cend(_events),
+                                [](const auto& x, const auto& y) {
+                                  auto sx = x.second->startTime(),
+                                       sy = y.second->startTime();
                                   if(sx && sy)
                                     return sx.value() < sy.value();
                                   else
                                     return false;
                                 })
-            ->startTime();
+            ->second->startTime();
       }
       else
       {
@@ -79,19 +80,20 @@ namespace CatalogiCpp
       }
     }
 
-    std::optional<time_t> stopTime()
+    std::optional<time_t> stopTime() const
     {
       if(_events.size())
       {
-        return std::max_element(std::begin(_events), std::end(_events),
-                                [](const Event_t& x, const Event_t& y) {
-                                  auto sx = x.stopTime(), sy = y.stopTime();
+        return std::max_element(std::cbegin(_events), std::cend(_events),
+                                [](const auto& x, const auto& y) {
+                                  auto sx = x.second->stopTime(),
+                                       sy = y.second->stopTime();
                                   if(sx && sy)
                                     return sx.value() < sy.value();
                                   else
                                     return false;
                                 })
-            ->stopTime();
+            ->second->stopTime();
       }
       else
       {
