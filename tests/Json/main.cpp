@@ -3,7 +3,11 @@
 #include <CatalogueIO.hpp>
 #include <Event.hpp>
 #include <Repository.hpp>
+#if __has_include(<nlohmann/json.hpp>)
 #include <nlohmann/json.hpp>
+#else
+#include <json.hpp>
+#endif
 
 namespace
 {
@@ -39,7 +43,8 @@ namespace
     // js2 << ss;
     // auto c2 = js2.get<CatalogiCpp::Catalogue<double>>();
     // EXPECT_EQ(c, c2);
-    //TODO Should think about this later but saving a catalogue alone doesn't make any sense now
+    // TODO Should think about this later but saving a catalogue alone doesn't
+    // make any sense now
   }
 
 } // namespace

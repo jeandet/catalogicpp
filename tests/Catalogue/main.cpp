@@ -1,6 +1,10 @@
 #include "gtest/gtest.h"
 #include <Catalogue.hpp>
-#include <Event.hpp>
+#if __has_include(<nlohmann/json.hpp>)
+#include <nlohmann/json.hpp>
+#else
+#include <json.hpp>
+#endif
 
 namespace
 {
